@@ -1,2 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spothero_rates
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
 server:
   port: 5000
