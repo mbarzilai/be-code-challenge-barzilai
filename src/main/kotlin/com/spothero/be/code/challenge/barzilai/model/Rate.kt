@@ -1,17 +1,21 @@
 package com.spothero.be.code.challenge.barzilai.model
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.DayOfWeek
 
 @Entity
 @Table
 class Rate(
 
-//    @Enumerated(EnumType.ORDINAL)
     @ElementCollection(targetClass = DayOfWeek::class)
-//    @CollectionTable(name = "DayOfWeek", joinColumns = @JoinColumn(name = "rateId"))
     @Column(name = "dayOfWeek", nullable = false)
-    val days: Set<DayOfWeek>,
+    val days: List<DayOfWeek>,
 
     @Column(nullable = false)
     val startTime: String,

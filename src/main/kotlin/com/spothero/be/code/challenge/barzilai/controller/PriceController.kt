@@ -3,8 +3,7 @@ package com.spothero.be.code.challenge.barzilai.controller
 import com.spothero.be.code.challenge.barzilai.dto.model.PriceResponse
 import com.spothero.be.code.challenge.barzilai.exception.UnavailableException
 import com.spothero.be.code.challenge.barzilai.exception.ValidationException
-import com.spothero.be.code.challenge.barzilai.repository.RateRepository
-import org.springframework.beans.factory.annotation.Autowired
+import com.spothero.be.code.challenge.barzilai.service.RateService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,20 +14,15 @@ import java.time.Instant
 
 @RestController
 @RequestMapping("price")
-class PriceController {
-
-    @Autowired
-    lateinit var rateRepository: RateRepository
+class PriceController(private val rateService: RateService) {
 
     @GetMapping(produces = ["application/json"])
     fun getPrice(
-        @RequestParam("start")
-        start: Instant,
-        @RequestParam("end")
-        end: Instant
-    ): ResponseEntity<Any> {
+        @RequestParam("start") start: Instant,
+        @RequestParam("end") end: Instant
+    ): ResponseEntity<PriceResponse> {
         validateStartAndEnd(start, end)
-        val price: Int? = rateRepository.findPriceByStartAndEndInstants(start, end)
+        val price: Int? = rateService.getRatePriceByStartAndEnd(start, end)
         return price?.let { ResponseEntity(PriceResponse(it), HttpStatus.OK) } ?: throw UnavailableException()
     }
 
