@@ -1,6 +1,7 @@
 package com.spothero.be.code.challenge.barzilai.controller
 
 import com.spothero.be.code.challenge.barzilai.dto.model.Rates
+import com.spothero.be.code.challenge.barzilai.dto.validation.RatesValidator
 import com.spothero.be.code.challenge.barzilai.service.RateService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("rates")
-class RatesController(private val rateService: RateService) {
+class RatesController(
+    private val rateService: RateService,
+    private val ratesValidator: RatesValidator
+) {
 
     @GetMapping(produces = ["application/json"])
     fun getRates(): ResponseEntity<Rates> {
@@ -23,7 +27,8 @@ class RatesController(private val rateService: RateService) {
     fun updateRates(
         @RequestBody ratesBody: Rates
     ): ResponseEntity<Rates> {
+        ratesValidator.validateRates(ratesBody)
         val updatedRates = rateService.updateAllRates(ratesBody.rates)
-        return ResponseEntity(Rates(rateService.getAllRates()), HttpStatus.OK)
+        return ResponseEntity(Rates(updatedRates), HttpStatus.OK)
     }
 }
