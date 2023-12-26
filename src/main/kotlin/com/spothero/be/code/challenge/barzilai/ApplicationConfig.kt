@@ -7,14 +7,18 @@ import com.spothero.be.code.challenge.barzilai.dto.validation.RatesValidator
 import com.spothero.be.code.challenge.barzilai.exception.ValidationException
 import com.spothero.be.code.challenge.barzilai.filter.OverrideParametersEncodingFilter
 import com.spothero.be.code.challenge.barzilai.service.RateService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import org.springframework.web.filter.CommonsRequestLoggingFilter
 
 @Component
 class ApplicationConfig {
-
+    
+    val log: Logger = LoggerFactory.getLogger(ApplicationConfig::class.java)
     @Bean
     fun seedInitialData(rateMapper: RateMapper, ratesValidator: RatesValidator, rateService: RateService): CommandLineRunner {
         return CommandLineRunner {
@@ -25,9 +29,9 @@ class ApplicationConfig {
                 ratesValidator.validateRates(ratesFile)
                 rateService.updateAllRates(ratesFile.rates)
             } catch (e: ValidationException) {
-                println("Unable to seed rates into database because invalid rate supplied in initial file: ${e.message}")
+                log.error("Unable to seed rates into database because invalid rate supplied in initial file: ${e.message}")
             } catch (e: Exception) {
-                println("Unable to seed rates into database:  ${e.message}")
+                log.error("Unable to seed rates into database", e)
             }
         }
     }
@@ -37,5 +41,12 @@ class ApplicationConfig {
         val registrationBean = FilterRegistrationBean(filter)
         registrationBean.addUrlPatterns("/price")
         return registrationBean
+    }
+
+    @Bean
+    fun logFilter(): CommonsRequestLoggingFilter {
+        val filter = CommonsRequestLoggingFilter()
+        filter.setIncludeQueryString(true)
+        return filter
     }
 }
