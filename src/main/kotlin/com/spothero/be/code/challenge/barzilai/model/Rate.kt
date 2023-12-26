@@ -18,10 +18,16 @@ class Rate(
     val days: List<DayOfWeek>,
 
     @Column(nullable = false)
-    val startTime: String,
+    val startHour: String,
 
     @Column(nullable = false)
-    val endTime: String,
+    val startMin: String,
+
+    @Column(nullable = false)
+    val endHour: String,
+
+    @Column(nullable = false)
+    val endMin: String,
 
     @Column(nullable = false)
     val timeZone: String,

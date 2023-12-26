@@ -10,21 +10,24 @@ import java.time.Instant
 @Repository
 interface RateRepository : CrudRepository<Rate, Int> {
 
-    @Query(value = """
-            SELECT
-                r.price
-            FROM
-                rate r
-                JOIN rate_days rd ON r.id = rd.rate_id
-            WHERE
-                rd.day_of_week = extract(isodow FROM :requestStart at time zone r.time_zone)
-                AND rd.day_of_week = extract(isodow FROM :requestEnd at time zone r.time_zone)
-                AND r.start_time\:\:time at time zone r.time_zone <= :requestStart\:\:time at time zone r.time_zone
-                AND r.end_time\:\:time at time zone r.time_zone >= :requestEnd\:\:time at time zone r.time_zone
-            """,
-        nativeQuery = true)
+    @Query(value = QUERY_STRING, nativeQuery = true)
     fun findPriceByStartAndEndInstants(
         @Param("requestStart") requestStart: Instant,
         @Param("requestEnd") requestEnd: Instant
     ) : Int?
+
+    companion object {
+        private const val QUERY_STRING = """
+SELECT
+    r.price
+FROM
+    rate r
+    JOIN rate_days rd ON r.id = rd.rate_id
+WHERE
+    rd.day_of_week = extract(isodow FROM :requestStart at time zone r.time_zone)
+    AND rd.day_of_week = extract(isodow FROM :requestEnd at time zone r.time_zone)
+    AND make_time(cast(r.start_hour as int), cast(r.start_min as int), 00) <= cast(:requestStart at time zone r.time_zone as time)
+    AND make_time(cast(r.end_hour as int), cast(r.end_min as int), 00) >= cast(:requestEnd at time zone r.time_zone as time)
+"""
+    }
 }
