@@ -12,6 +12,7 @@ import java.time.zone.ZoneRulesProvider
 class RatesValidator {
     fun validateRates(ratesList: Rates) {
         ratesList.rates.forEach { validateRate(it) }
+        // TODO: For production code, I would add validation that the rates don't overlap
     }
 
     private fun validateRate(rate: RateDTO) {

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -95,5 +96,13 @@ class PriceControllerTest {
         }
 
         verify(exactly = 0) { rateService.getRatePriceByStartAndEnd(any(), any()) }
+    }
+
+    @Test
+    fun testHandleResponseUnavailableException() {
+        val exception: ResponseEntity<String> = priceController.handleResponseUnavailableException(UnavailableException())
+
+        assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+        assertThat(exception.body).isEqualTo("unavailable")
     }
 }

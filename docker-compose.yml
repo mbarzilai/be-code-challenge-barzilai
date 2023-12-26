@@ -1,7 +1,7 @@
 services:
   psql-db:
-    image: postgres
-    container_name: psql-db
+    image: postgres:alpine
+    container_name: postgresql-container
     restart: always
     environment:
       - POSTGRES_USER=admin
@@ -18,7 +18,7 @@ services:
     ports:
       - '5000:5000'
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql-db:5432/spothero_rates
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql-container:5432/spothero_rates
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=1234
     depends_on:

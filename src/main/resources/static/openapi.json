@@ -1,0 +1,231 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/rates": {
+      "get": {
+        "tags": [
+          "rates-controller"
+        ],
+        "summary": "Get stored rates",
+        "description": "Get stored rates",
+        "operationId": "getRates",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rates"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "rates-controller"
+        ],
+        "summary": "Update stored rates",
+        "description": "Update rate information by submitting a rates JSON. This submitted JSON overwrites the stored rates. Returns the stored list of rates.",
+        "operationId": "updateRates",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rates"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rates"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/price": {
+      "get": {
+        "tags": [
+          "price-controller"
+        ],
+        "summary": "Request the price for a specified time",
+        "description": "Request the price for a specified start time and end time. If no applicable rate is found or input spans more than one day, returns \"unavailable\"",
+        "operationId": "getPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start time of request. Specify date/time as ISO-8601 with timezone. Must be before end time.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2015-07-04T15:00:00+00:00"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End time of request. Specify date/time as ISO-8601 with timezone. Must be after start time.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "example": "2015-07-04T20:00:00+00:00"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Price unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "unavailable"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RateDTO": {
+        "required": [
+          "days",
+          "price",
+          "times",
+          "tz"
+        ],
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "string",
+            "description": "Comma separated string of days of the week the rate applies to. Accepted abbreviations for each day of the week are: mon, tues, wed, thurs, fri, sat, sun",
+            "example": "mon,tues,thurs"
+          },
+          "times": {
+            "type": "string",
+            "description": "Time range the rate is valid. Start time and end time are represented as four numbers (no colon) and are separated by a dash(-). Use 0000 to represent midnight. End time must not be greater than 2359",
+            "example": "0900-2100"
+          },
+          "tz": {
+            "type": "string",
+            "description": "Time zone for rate times. Must adhere to 2017c version of the tz database",
+            "example": "America/Chicago"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price of the rate",
+            "format": "int32",
+            "example": 1500
+          }
+        },
+        "description": "List of valid rates. Must not overlap."
+      },
+      "Rates": {
+        "required": [
+          "rates"
+        ],
+        "type": "object",
+        "properties": {
+          "rates": {
+            "type": "array",
+            "description": "List of valid rates. Must not overlap.",
+            "items": {
+              "$ref": "#/components/schemas/RateDTO"
+            }
+          }
+        }
+      },
+      "PriceResponse": {
+        "required": [
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "example": 5000
+          }
+        }
+      }
+    }
+  }
+}
